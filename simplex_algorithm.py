@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     # 2. By passing the coefficients of A, b, and c
     # In this case:
-    # - We assume to have the standard form A*x <= b
+    # - We assume to have the standard form max c^T*x s.t. A*x <= b
     # - Decision variables are enumerated by (x_0, ..., x_n)
     # - Slack variables associated with constraints are enumerated by (c_0, ..., c_m)
     A = np.array([[1, 2], [1, 0]])
