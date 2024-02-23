@@ -7,8 +7,8 @@ The algorithms include:
 * [Floyd's algorithm](https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm) for calculating all shortest paths in graphs.
 * The [Ford-Fulkerson algorithm](https://en.wikipedia.org/wiki/Ford%E2%80%93Fulkerson_algorithm) for computing maximum flow (minimum cuts) in graphs.
 * A simplistic implementation of the [revised Simplex method](https://en.wikipedia.org/wiki/Revised_simplex_method) that can be used for:
-  * solving [Linear Programming Problems](https://en.wikipedia.org/wiki/Linear_programming),
-  * reformulating and solving such problems as [Dual Programs](https://en.wikipedia.org/wiki/Dual_linear_program),
+  * solving [Linear Programming Problems](https://en.wikipedia.org/wiki/Linear_programming) of the form $\max c^\intercal x$ subject to $Ax \leq b, x\geq 0$,
+  * reformulating and solving such problems as [Dual Programs](https://en.wikipedia.org/wiki/Dual_linear_program) $\min b^\intercal w$ subject to $A^\intercal w \geq c, w \geq 0$,
   * solving Integer Linear Programs by means [Gomory's Cutting-Plane](https://en.wikipedia.org/wiki/Cutting-plane_method) method,
   * TODO: solving Integer Linear Programs by means of the [Branch and Bound](https://en.wikipedia.org/wiki/Branch_and_bound) method.
 * The [modified distribution (MODI) method](https://de.wikipedia.org/wiki/Transportproblem) for solving linear transportation problems.
