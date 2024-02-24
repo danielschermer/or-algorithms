@@ -67,12 +67,12 @@ class HungarianMethod:
 
             # Check if we have a zero in the same row
             for [i, j] in args[np.where(args[:, 0] == row)]:
-                if i != row or j != col:
+                if j != col:
                     index_to_dependent[(row, col)].add((i, j))
 
             # Check if we have a zero in the same column
             for [i, j] in args[np.where(args[:, 1] == col)]:
-                if i != row or j != col:
+                if i != row:
                     index_to_dependent[(row, col)].add((i, j))
 
         while len(index_to_dependent) > 0:
@@ -185,15 +185,16 @@ class HungarianMethod:
             if j in marked_cols:
                 self.v[j] -= eta
 
-    def print(self):
-        table = []
+    def print_tableau(self):
+        """Prints the current tableau."""
+        tableau = []
 
         # Header
         header = [""]
         for i in range(self.m):
             header.append(str(i))
         header.append("u_i")
-        table.append(header)
+        tableau.append(header)
 
         # Rows
         for j in range(self.n):
@@ -201,17 +202,16 @@ class HungarianMethod:
             for i in range(self.m):
                 row.append(str(self.cost[i][j]))
             row.append(self.u[j])
-            table.append(row)
+            tableau.append(row)
 
         # Footer
         footer = ["v_j"]
         for j in range(self.n):
             footer.append(str(self.v[j]))
-        table.append(footer)
+        footer.append(str(self.get_objective()))
+        tableau.append(footer)
 
-        print(tabulate(table, headers="firstrow", tablefmt="fancy_grid", floatfmt=".3f"))
-
-        pass
+        print(tabulate(tableau, headers="firstrow", tablefmt="fancy_grid", floatfmt=".3f"))
 
     def optimize(self):
         """
@@ -225,15 +225,17 @@ class HungarianMethod:
 
         if self.verbose:
             print("We are given the following assignment problem.")
-            self.print()
+            self.print_tableau()
         self.initialize()
         if self.verbose:
-            print(f"The following dual-feasible solution has a cost of {self.get_objective()}.")
-            self.print()
+            print(
+                f"Subtracting the minimum of each column and minimum of each row yields the following dual-feasible solution with a cost of {self.get_objective()}."
+            )
+            self.print_tableau()
         self.get_independent_zeros()
         if self.verbose:
             print(
-                f"The maximal number of independent zeroes corresponds to the (rows, cols): {self.independent}"
+                f"The maximal number of independent zeroes is {len(self.independent)}. This corresponds to the (rows, cols): {self.independent}."
             )
 
         # If we have n=m independent zeros, we have found an optimal solution.
@@ -242,13 +244,13 @@ class HungarianMethod:
             self.update_dual_variables()
             if self.verbose:
                 print(
-                    f"Updating the dual variables based on these independent zeroes yields the following tableau."
+                    "Updating the dual variables based on these independent zeroes yields the following tableau."
                 )
-                self.print()
+                self.print_tableau()
             self.get_independent_zeros()
             if self.verbose:
                 print(
-                    f"The maximal number of independent zeroes corresponds to the (rows, cols): {self.independent}."
+                    f"The maximal number of independent zeroes is {len(self.independent)}. This corresponds to the (rows, cols): {self.independent}."
                 )
 
         if self.verbose:
