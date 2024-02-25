@@ -4,33 +4,36 @@ from misc.graph import Graph, Vertex
 class FordFulkerson:
     """Implements the Ford-Fulkerson algorithm for finding the maximum flow in a weighted graph."""
 
-    def __init__(self, graph: Graph, verbose=False):
+    def __init__(self, verbose=False):
         """Initialize the algorithm with a Graph
 
         Args:
             graph (Graph): A Graph object.
             verbose (bool, optional): Whether or not to print step-by-step solutions. Defaults to False.
         """
-        # Nodes and neighbors copied from the Graph g
+        # Nodes and neighbors
         self.nodes = set()
         self.neighbors = {}
-        self.initialize_residuals(graph)
 
-        # Predecessors and residual capacity; continuously updated by calls to self.bfs()
+        # Predecessors and residual capacity (continuously updated by calls to self.bfs())
         self.pred = {}
         self.residual = {}
-
-        self.verbose = verbose
 
         # Stores the result
         self.cut_set = set()
         self.max_flow = 0
 
-    def initialize_residuals(self, graph):
-        """
-        Initializes the residual capacity to the weight of each edge.
-        """
+        self.verbose = verbose
+
+    def init_from_graph(self, graph):
+        """Initializes the residual capacity to the weight of each edge."""
         self.nodes = set(graph.get_nodes())
+
+        # Reset the result
+        self.cut_set = set()
+        self.max_flow = 0
+        self.pred = {}
+        self.residual = {}
 
         for v in graph.get_nodes():
             self.residual[v] = {}
@@ -59,16 +62,14 @@ class FordFulkerson:
                     unvisited.remove(n)
                     self.pred[n] = curr
 
-        # If t is not in unvisited, then a residual (s, t) path exists
+        # Return true if we found an augmenting path
         return t not in unvisited
 
-    def calc_maximum_flow(self, s, t):
-        """Determines the maximum flow (if existent) by means of the Ford-Fulkerson algorithm.
+    def calc_maximum_flow(self, graph: Graph, s, t):
+        """Determines the maximum flow (if existent) by means of the Ford-Fulkerson algorithm."""
 
-        Args:
-            start (key): Key associated with the start location in the graph.
-            target (key): Key associated with the target location in the graph.
-        """
+        # Initialize values from graph
+        self.init_from_graph(graph)
 
         # As long as there exists an augmenting (s,t)-path (found by means of BFS).
         while self.bfs(s, t):
@@ -76,11 +77,10 @@ class FordFulkerson:
             # Capacity of the augmenting path
             path_flow = float("inf")
 
-            # Traverse the path in reverse to determine the path_flow
+            # Traverse the path in reverse to determine the path_flow bottleneck
             curr = t
             path = [curr]
             while curr != s:
-                # Find the bottleneck
                 prev = self.pred[curr]
                 path_flow = min(path_flow, self.residual[prev][curr])
 
@@ -88,7 +88,9 @@ class FordFulkerson:
                 path.append(curr)
 
             if self.verbose:
-                print(f"Found path {path[::-1]} with capacity {path_flow} from {s} to {t}.")
+                print(
+                    f"Found augmenting path {path[::-1]} with capacity {path_flow} from {s} to {t}."
+                )
 
             # Update the maximum flow based on the current path
             self.max_flow += path_flow
@@ -106,7 +108,7 @@ class FordFulkerson:
         self.calc_cut_set(s, t)
         if self.verbose:
             print(
-                f"No further flow is possible from {s} to {t}. The maximum flow is {self.max_flow}."
+                f"No further augmenting path exists from {s} to {t}. The maximum flow is {self.max_flow}."
             )
             print(
                 f"The corresponding min-cut has a weight of {self.max_flow} and corresponds to the cut-set: {self.cut_set}"
@@ -139,15 +141,18 @@ class FordFulkerson:
 
         # Identify edges that belong to the cut-set.
         for i in self.nodes:
+            # i must be reachable from s
+            if i not in visited:
+                continue
             for j in self.neighbors[i]:
-                # If i is reachable from s but j is not, then (i, j) is a candidate
-                if i in visited and j in unvisited:
-                    # (i,j) must have no residual capacity but must be an edge in the original graph
-                    if self.residual[i][j] == 0 and self.neighbors[i][j] != 0:
-                        cut_set.add((i, j))
+                # j must noe be reachable from s
+                if j not in unvisited:
+                    continue
+                # (i,j) must have no residual capacity but must be an edge in the original graph
+                if self.residual[i][j] == 0 and self.neighbors[i][j] != 0:
+                    cut_set.add((i, j))
 
         self.cut_set = cut_set
-
         return cut_set
 
     def get_max_flow(self):
@@ -178,14 +183,8 @@ if __name__ == "__main__":
 
     g = Graph(vertices.values())
 
-    ff = FordFulkerson(g, verbose=True)
-    ff.calc_maximum_flow("A", "E")
-
-    ff = FordFulkerson(g, verbose=True)
-    ff.calc_maximum_flow("K", "E")
-
-    ff = FordFulkerson(g, verbose=True)
-    ff.calc_maximum_flow("F", "J")
-
-    ff = FordFulkerson(g, verbose=True)
-    ff.calc_maximum_flow("H", "D")
+    ff = FordFulkerson(verbose=True)
+    ff.calc_maximum_flow(g, "A", "E")
+    ff.calc_maximum_flow(g, "K", "E")
+    ff.calc_maximum_flow(g, "F", "J")
+    ff.calc_maximum_flow(g, "H", "D")

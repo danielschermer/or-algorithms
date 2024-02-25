@@ -20,8 +20,8 @@ class TestFordFulkerson(unittest.TestCase):
         vertices[5].add_neighbors([(3, 5), (4, 3)])
 
         g = Graph(vertices.values())
-        ff = FordFulkerson(g)
-        ff.calc_maximum_flow(0, 5)
+        ff = FordFulkerson()
+        ff.calc_maximum_flow(g, 0, 5)
 
         assert (
             ff.get_max_flow() == 8
@@ -49,8 +49,8 @@ class TestFordFulkerson(unittest.TestCase):
 
         g = Graph(vertices.values())
 
-        ff = FordFulkerson(g)
-        ff.calc_maximum_flow("K", "E")
+        ff = FordFulkerson()
+        ff.calc_maximum_flow(g, "K", "E")
         assert (
             ff.get_max_flow() == 11
             and len(
@@ -61,8 +61,7 @@ class TestFordFulkerson(unittest.TestCase):
             == 0
         )
 
-        ff = FordFulkerson(g)
-        ff.calc_maximum_flow("F", "J")
+        ff.calc_maximum_flow(g, "F", "J")
         assert (
             ff.get_max_flow() == 14
             and len(
@@ -71,8 +70,7 @@ class TestFordFulkerson(unittest.TestCase):
             == 0
         )
 
-        ff = FordFulkerson(g)
-        ff.calc_maximum_flow("H", "D")
+        ff.calc_maximum_flow(g, "H", "D")
         assert (
             ff.get_max_flow() == 13
             and len(
